@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Charts</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link th:href="@{css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{css/cover.css}" rel="stylesheet">
+    <link th:href="@{css/backgrounds.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{css/homePage.css}" rel="stylesheet">
+    <link th:href="@{css/songDetails.css}" rel="stylesheet">
+    <link th:href="@{css/searchForm.css}" rel="stylesheet">
+    <script th:src="@{/js/searchSong.js}"></script>
+</head>
+<body class="text-center">
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto">
+        <h3 class="masthead-brand">Lyrics Search</h3>
+
+        <form th:action="@{/search}" method="get" class="search-form">
+            <input type="text" id="query" name="query" placeholder="Enter song title or artist name"
+                   oninvalid="setCustomValidity('Enter song title')" required="">
+            <button class="button" type="submit">Search</button>
+            <div id="searchResults" class="search-results"></div>
+        </form>
+
+        <nav class="nav nav-masthead justify-content-center">
+            <div class="dropdown nav-link active">
+                <p sec:authentication="name"></p>
+                <div class="dropdown-content">
+                    <div class="dropdown-content">
+                        <a class="" href="/edit">Edit account</a>
+                        <a class="" href="/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+            <a sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN','USER')" class="nav-link active"
+               href="/song-add">Add song</a>
+            <a sec:authorize="hasAuthority('USER')" class="nav-link active"
+               href="/all-songs">All songs</a>
+            <a sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN','USER')" class="nav-link active"
+               href="/home">Home</a>
+        </nav>
+    </header>
+    <main role="main" class="inner cover">
+        <div class="filter-container">
+            <label th:for="period">Period:</label>
+            <select id="period-select">
+                <option value="year">Year</option>
+                <option value="month">Month</option>
+                <option value="week">Week</option>
+                <option selected value="day">Day</option>
+            </select>
+
+            <label th:for="genres">Genre:</label>
+            <select id="genre-select">
+                <option value="0">All genres</option>
+                <option th:each="genre : ${genres}" th:value="${genre.getId()}"
+                        th:text="${genre.getTitle()}"></option>
+            </select>
+        </div>
+
+
+        <div id="songs-container" style="text-align: center;">
+            <div th:each="song, songStat : ${songs}" class="song-details">
+                <div class="song-title" th:text="${song.title}"></div>
+                <div class="song-artist" th:text="${song.artist}"></div>
+                <div class="song-views" th:text="${song.totalViews}">Views</div>
+                <div class="song-button">
+                    <a th:href="@{/song(id = ${song.getId()})}">Show</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <ul class="pagination-list">
+                <li class="pagination-item" th:class="${page == 0 ? 'disabled' : ''}">
+                    <a class="pagination-link"
+                       th:href="@{${'charts'} (period=${period}, genre=${genre}, page=${page - 1})}"
+                       th:text="${'<<'}"></a>
+                </li>
+                <li class="pagination-item"
+                    th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:class="${pageNumber == page ? 'active' : ''}">
+                    <a class="pagination-link"
+                       th:href="@{${'charts'}( period=${period}, genre=${genre}, page=${pageNumber})}"
+                       th:text="${pageNumber + 1}"></a>
+                </li>
+                <li class="pagination-item"
+                    th:class="${page == totalPages - 1 ? 'disabled' : ''}">
+                    <a class="pagination-link"
+                       th:href="@{${'charts'}(period=${period}, genre=${genre}, page=${page + 1})}"
+                       th:text="${'>>'}"
+                       data-page="${page}"></a>
+                </li>
+            </ul>
+        </div>
+    </main>
+    <footer class="mastfoot mt-auto">
+        <div class="inner">
+            <p>Lyrics search for <a href="http://geekhub.ck.ua">Geekhub</a>, by <a
+                href="">Ivan Dulskyi</a>.</p>
+        </div>
+    </footer>
+</div>
+<script>
+    function getSongs(page) {
+        let period = $("#period-select").val();
+        let genreId = $("#genre-select").val();
+
+        $.ajax({
+            url: "/charts",
+            type: "GET",
+            data: {
+                period: period,
+                genreId: genreId,
+                page: page
+            },
+            success: function (response) {
+                $("#songs-container").html($(response).find("#songs-container").html());
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+    }
+
+    $("#period-select, #genre-select").on("change", function () {
+        getSongs(0);
+    });
+
+
+    $(".pagination").on("click", ".pagination-link", function (e) {
+        e.preventDefault();
+        if ($(this).hasClass("disabled")) {
+            return;
+        }
+
+        let page = getPageFromUrl($(this).attr("href"));
+        getSongs(page);
+    });
+
+    function getPageFromUrl(url) {
+        const regex = /page=(\d+)/;
+        const match = url.match(regex);
+        if (match && match[1]) {
+            return parseInt(match[1]);
+        }
+        return 0;
+    }
+</script>
+</body>
+</html>

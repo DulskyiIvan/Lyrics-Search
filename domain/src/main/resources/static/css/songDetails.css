@@ -1,0 +1,65 @@
+.song-details {
+    align-items: center;
+    display: block;
+    margin-bottom: 10px;
+    border: 1px solid rgb(8 79 95 / 50%);
+    border-radius:10px;
+    padding: 10px;
+}
+
+.song-details .song-title,
+.song-details .song-artist,
+.song-details .song-views,
+.song-details .song-button {
+    display: inline-block;
+    margin-right: 30px;
+    font-size: 25px;
+    color:black;
+    font-style:italic
+}
+
+
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-item {
+    display: flex;
+    align-items: center;
+    margin: 0 5px;
+}
+
+.pagination-link {
+    display: inline-block;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.pagination-link:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination-item.disabled .pagination-link {
+    pointer-events: none;
+    color: #ccc;
+}
+
+.pagination-item.active .pagination-link {
+    background-color: #333;
+    color: #fff;
+}

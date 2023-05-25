@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit user</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <a href="/home">Back to main</a>
+        <h2>Edit account '<span sec:authentication="name"></span>'</h2>
+        <p class="lead">Please do logout from account for apply changing</p>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-8 order-md-1">
+            <h4 class="mb-3">Changing data</h4>
+            <div id="passwordChangeMessage" th:text="${successMessage}"></div>
+            <form method="POST" th:action="@{/edit/update-password}">
+                <span th:if="${validationPasswordResult}">
+                        <ul>
+                            <li>Not saved</li>
+                        </ul>
+                        <ul th:each="error: ${validationPasswordResult.errors}">
+                            <li th:text="${error}"></li>
+                        </ul>
+                    </span>
+                <div class="mb-3">
+                    <input class="form-control" type="password" name="oldPassword"
+                           placeholder="Input old password"
+                           th:value="${passwordForm.oldPassword}"
+                           oninvalid="setCustomValidity('Input old password')"
+                           oninput="setCustomValidity('')" required/>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control" type="password" name="newPassword"
+                           placeholder="Input new password"
+                           th:value="${passwordForm.newPassword}"
+                           oninvalid="setCustomValidity('Input new password')"
+                           oninput="setCustomValidity('')" required/>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control" type="password" name="passwordConfirmation"
+                           placeholder="Input new password confirmation"
+                           th:value="${passwordForm.passwordConfirmation}"
+                           oninvalid="setCustomValidity('Input password confirmation')"
+                           oninput="setCustomValidity('')" required/>
+                </div>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Change password</button>
+            </form>
+            <form method="post" th:action="@{/edit/update-user}">
+                <span th:if="${editUserValidationResult}">
+                        <ul th:each="error: ${editUserValidationResult.errors}">
+                            <li th:text="${error}"></li>
+                        </ul>
+                    </span>
+                <div class="mb-3">
+                    <label for="idFirstName">First name</label>
+                    <input class="form-control" type="text" name="firstName" id="idFirstName"
+                           placeholder="First name"
+                           th:value="${firstName}" required/>
+                </div>
+                <div class="mb-3">
+                    <label for="idLastName">Last name</label>
+                    <input class="form-control" type="text" name="lastName" id="idLastName"
+                           placeholder="Last name"
+                           th:value="${lastName}"
+                           required/>
+                </div>
+                <div class="mb-3">
+                    <label for="idEmail">E-mail</label>
+                    <input class="form-control" type="text" name="email" id="idEmail"
+                           placeholder="Email"
+                           th:value="${email}" required/>
+                </div>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Change data</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

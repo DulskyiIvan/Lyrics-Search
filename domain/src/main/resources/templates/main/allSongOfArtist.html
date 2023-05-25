@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>All songs</title>
+    <link th:href="@{css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{css/cover.css}" rel="stylesheet">
+    <link th:href="@{css/backgrounds.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{css/homePage.css}" rel="stylesheet">
+    <link th:href="@{css/searchForm.css}" rel="stylesheet">
+    <script th:src="@{/js/searchSong.js}"></script>
+</head>
+<body class="text-center">
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto">
+        <h3 class="masthead-brand">Lyrics Search</h3>
+
+        <form th:action="@{/search}" method="get" class="search-form">
+            <input type="text" id="query" name="query" placeholder="Enter song title or artist name"
+                   oninvalid="setCustomValidity('Enter song title')" required="">
+            <button class="button" type="submit">Search</button>
+            <div id="searchResults" class="search-results"></div>
+        </form>
+
+        <nav class="nav nav-masthead justify-content-center">
+            <div class="dropdown nav-link active">
+                <p sec:authentication="name"></p>
+                <div class="dropdown-content">
+                    <div class="dropdown-content">
+                        <a class="" href="/edit">Edit account</a>
+                        <a class="" href="/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+            <a sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN','USER')" class="nav-link active"
+               href="/song-add">Add song</a>
+            <a sec:authorize="hasAnyAuthority('USER')" class="nav-link active"
+               href="/charts">Charts</a>
+            <a sec:authorize="hasAuthority('USER')" class="nav-link active"
+               href="/all-songs">All songs</a>
+            <a sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN','USER')" class="nav-link active"
+               href="/home">Home</a>
+        </nav>
+    </header>
+    <main role="main" class="inner cover">
+        <input
+            style="float: left;margin-right: 10px;"
+            action="action"
+            onclick="window.history.go(-1); return false;"
+            type="submit"
+            value="<-back"
+        />
+        <input type="hidden" id="artist-id" th:value="${artistId}">
+        <h1 style="margin-bottom: 50px;" th:text="${artist.name}"></h1>
+        <table style="margin: 0 auto; text-align: center;width: 600px;" id="song-table">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Artist</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div style="display: flex;justify-content: center;margin-top: 20px;"
+             id="pagination-songs-container"></div>
+    </main>
+    <footer class="mastfoot mt-auto">
+        <div class="inner">
+            <p>Lyrics search for <a href="http://geekhub.ck.ua">Geekhub</a>, by <a
+                href="">Ivan Dulskyi</a>.</p>
+        </div>
+    </footer>
+</div>
+<script src="/js/main/showAllSongByArtist.js"></script>
+</body>
+</html>

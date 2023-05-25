@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Page</title>
+    <link th:href="@{/css/cover.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/backgrounds.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/homePage.css}" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body class="text-center">
+
+<header class="masthead mb-auto">
+    <h3 class="masthead-brand">Admin panel</h3>
+    <nav class="nav nav-masthead justify-content-center">
+        <a sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN','USER')" class="nav-link active"
+           href="/home">Home</a>
+    </nav>
+</header>
+<div>
+    <ul id="nav-item-panel" class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link active" href="#genres" data-toggle="tab">Manage
+            genres</a></li>
+        <li class="nav-item"><a class="nav-link" href="#users" data-toggle="tab">Manage users</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#artists" data-toggle="tab">Manage
+            artists</a>
+        <li class="nav-item"><a class="nav-link" href="#songs" data-toggle="tab">Manage songs</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#proposes" data-toggle="tab">Manage proposes
+            edit lyrics</a>
+        </li>
+    </ul>
+</div>
+<div class="tab-content">
+
+    <div class="tab-pane active" id="genres">
+        <h2>Manage genres</h2>
+        <form th:action="@{/admin/add-genre}" method="post" id="add-genre-form">
+            <input type="text" name="name" placeholder="title of genre">
+            <button type="submit">Add genre</button>
+        </form>
+        <ul id="genre-list"></ul>
+    </div>
+
+    <div class="tab-pane" id="users">
+        <h2>Manage users</h2>
+        <form id="search-users-form">
+            <input type="text" name="username" placeholder="username">
+            <button type="submit">Search</button>
+            <button id="all-users-button">Get all</button>
+        </form>
+        <table id="user-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Username</th>
+                <th>Role</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div style="display: flex;justify-content: center;margin-top: 20px;"
+             id="pagination-users-container"></div>
+
+        <!-- Modal -->
+        <div class="modal" id="edit-password-modal" tabindex="-1" role="dialog"
+             aria-labelledby="edit-password-modal-label">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" style="float: left"
+                            id="edit-password-modal-label">
+                            Edit User</h4>
+                        <button type="button" style="float: right" class="close"
+                                data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="new-password-input">New Password:</label>
+                            <input type="text" class="form-control" id="new-password-input"
+                                   readonly>
+                        </div>
+                        <div style="margin-bottom: 20px">
+                            <button type="button" class="btn btn-primary"
+                                    id="generate-password-button">
+                                Generate Password
+                            </button>
+                            <button type="button" class="btn btn-primary"
+                                    id="save-password-button">
+                                Save password
+                            </button>
+                        </div>
+                        <div sec:authorize="hasAuthority('SUPERADMIN')" class="form-group">
+                            <label for="select-role">Select role</label>
+                            <select id="select-role">
+                                <option th:value="1" th:text="USER"></option>
+                                <option th:value="2" th:text="ADMIN"></option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 20px">
+                            <button type="button" class="btn btn-primary" id="save-role-button">
+                                Save role
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane" id="artists">
+        <h2>Manage artists</h2>
+        <form method="get" id="search-artists-form">
+            <input type="text" name="artist-name" placeholder="Artist name">
+            <button type="submit">Search</button>
+            <button id="all-artists-button">Get all</button>
+        </form>
+        <table id="artist-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Artist name</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div style="display: flex;justify-content: center;margin-top: 20px;"
+             id="pagination-artists-container"></div>
+
+        <!--Modal-->
+        <div class="modal" id="edit-artist-modal" tabindex="-1" role="dialog"
+             aria-labelledby="edit-artist-modal-label">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" style="float: left"
+                            id="edit-artist-modal-label">
+                            Edit Artist</h4>
+                        <button type="button" style="float: right" class="close"
+                                data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="edit-description-textarea">New description:</label>
+                            <textarea style="height: 250px" type="text" class="form-control"
+                                      id="edit-description-textarea"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-artist-name-input">New artist name:</label>
+                            <input type="text" class="form-control" id="new-artist-name-input">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="update-artist-button">
+                            Save artist
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane" id="songs">
+        <h2>Manage songs</h2>
+        <form id="search-songs-form">
+            <input type="text" name="title" placeholder="Title">
+            <button type="submit">Search</button>
+            <button id="all-songs-button">Get all</button>
+        </form>
+        <table id="song-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Artist</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div style="display: flex;justify-content: center;margin-top: 20px;"
+             id="pagination-songs-container"></div>
+    </div>
+
+
+    <div class="tab-pane" id="proposes">
+        <h2>Manage proposes edit lyrics</h2>
+            <button id="show-propose-button">Show proposes</button>
+            <button id="show-propose-by-date-button">Show by date</button>
+        <table id="propose-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Song title</th>
+                <th>Artist name</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div style="display: flex;justify-content: center;margin-top: 20px;"
+             id="pagination-proposes-container"></div>
+
+        <!--Modal-->
+        <div class="modal" id="edit-propose-modal" tabindex="-1" role="dialog"
+             aria-labelledby="edit-artist-modal-label">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" style="float: left"
+                            id="edit-propose-modal-label">
+                            New lyric</h4>
+                        <button type="button" style="float: right" class="close"
+                                data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="edit-lyric-textarea">New lyric:</label>
+                            <textarea style="height: 250px" type="text" class="form-control"
+                                      id="edit-lyric-textarea" readonly></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="add-lyric-button">
+                            Save lyric
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+<script th:src="@{/js/admin/editUser.js}"></script>
+<script th:src="@{/js/admin/editPropose.js}"></script>
+<script th:src="@{/js/admin/editPropose.js}"></script>
+<script th:src="@{/js/admin/showUsersTable.js}"></script>
+<script th:src="@{/js/admin/proposeShow.js}"></script>
+<script th:src="@{/js/admin/showArtistList.js}"></script>
+<script th:src="@{/js/admin/showSongList.js}"></script>
+<script th:src="@{/js/admin/editArtist.js}"></script>
+<script th:src="@{/js/admin/adminPanelTabs.js}"></script>
+</body>
+</html>

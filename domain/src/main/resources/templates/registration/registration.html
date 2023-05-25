@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>registration</title>
+    <link th:href="@{css/mainRegistration.css}" rel="stylesheet" media="all">
+    <link
+        th:href="@{https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i}"
+        rel="stylesheet">
+</head>
+<body>
+<div class="page-wrapper bg-blue p-t-100 p-b-100 font-robo">
+    <div class="wrapper wrapper--w680">
+        <div class="card card-1">
+            <div class="card-body">
+                <a style="text-align: center" href="/login">Already registered?</a>
+                <h2 class="title">Create account</h2>
+                <span th:if="${userRegistrationResult}">
+                        <ul th:each="error: ${userRegistrationResult.errors}">
+                            <li th:text="${error}"></li>
+                        </ul>
+                    </span>
+                <form name="f" method="POST" th:action="@{/registration}">
+                    <div class="input-group">
+                        <input class="input--style-1" type="text" name="username"
+                               placeholder="Username"
+                               th:value="${userRegistrationForm.username}"
+                               pattern="^[a-zA-Z0-9-_\.]{3,12}$"
+                               oninvalid="setCustomValidity('Username should contain 3-12 characters')"
+                               oninput="setCustomValidity('')" required>
+
+                    </div>
+                    <div class="input-group">
+                        <input class="input--style-1" type="password" name="password"
+                               placeholder="Password"
+                               th:value="${userRegistrationForm.password}"
+                               pattern="^[a-zA-Z0-9-_\.]{5,12}$"
+                               oninvalid="setCustomValidity('Password should contain 5-12 characters')"
+                               oninput="setCustomValidity('')" required>
+                    </div>
+                    <div class="input-group">
+                        <input class="input--style-1" type="password" name="passwordConfirmation"
+                               placeholder="Password confirmation"
+                               th:value="${userRegistrationForm.passwordConfirmation}"
+                               oninvalid="setCustomValidity('Input password confirmation')"
+                               oninput="setCustomValidity('')" required/>
+                    </div>
+                    <div class="input-group">
+                        <input class="input--style-1" type="text" name="firstName"
+                               placeholder="First name"
+                               th:value="${userRegistrationForm.firstName}"
+                               oninvalid="setCustomValidity('Input first name')"
+                               oninput="setCustomValidity('')"
+                               required/>
+                    </div>
+                    <div class="input-group">
+                        <input class="input--style-1" type="text" name="lastName"
+                               placeholder="Last name"
+                               th:value="${userRegistrationForm.lastName}"
+                               oninvalid="setCustomValidity('Input last name')"
+                               oninput="setCustomValidity('')"
+                               required/>
+                    </div>
+                    <div class="input-group">
+                        <input class="input--style-1" type="email" name="email" placeholder="Email"
+                               th:value="${userRegistrationForm.email}"
+                               pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                               oninvalid="setCustomValidity('Input correct e-mail')"
+                               oninput="setCustomValidity('')"
+                               required/>
+                    </div>
+                    <div class="p-t-20">
+                        <button class="btn btn--radius btn--green" type="submit">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

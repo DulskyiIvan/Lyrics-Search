@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lyrics Search</title>
+    <link th:href="@{css/cover.css}" rel="stylesheet">
+    <link th:href="@{css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{css/backgrounds.css}" rel="stylesheet" type="text/css">
+</head>
+<body class="text-center">
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto">
+        <h3 class="masthead-brand">Lyric Search</h3>
+        <nav class="nav nav-masthead justify-content-center">
+            <a sec:authorize="!isAuthenticated()" class="nav-link active" href="/login">Sign in</a>
+            <a sec:authorize="!isAuthenticated()" class="nav-link active" href="/registration">Sign
+                up</a>
+        </nav>
+    </header>
+    <main role="main" class="inner cover">
+        <h1 class="cover-heading">Welcome!</h1>
+        <div class="d-flex justify-content-center">
+            <img th:size="10" th:src="@{/images/music-note.jpg}" width="700" height="400">
+        </div>
+    </main>
+    <footer class="mastfoot mt-auto">
+        <div class="inner">
+            <p>Lyrics search for <a href="http://geekhub.ck.ua">Geekhub</a>, by <a
+                href="">Ivan Dulskyi</a>.</p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

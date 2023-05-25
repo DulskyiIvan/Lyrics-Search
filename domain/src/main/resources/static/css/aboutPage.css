@@ -1,0 +1,11 @@
+.cover-heading {
+    text-align: justify;
+    font-size: 145%;
+    color: white;
+}
+
+.inner {
+    border: 3px solid #fff;
+    border-radius: 10px;
+    display: inline-block;
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${song.title}"></title>
+    <link th:href="@{css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{css/cover.css}" rel="stylesheet">
+    <link th:href="@{css/modal-window.css}" rel="stylesheet">
+    <link th:href="@{css/backgrounds.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{css/homePage.css}" rel="stylesheet">
+    <link th:href="@{/css/comments.css}" rel="stylesheet">
+    <link th:href="@{/css/searchForm.css}" rel="stylesheet">
+    <script th:src="@{/js/searchSong.js}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body class="text-center">
+
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto">
+        <h3 class="masthead-brand">Lyric Search</h3>
+
+        <form th:action="@{/search}" method="get" class="search-form">
+            <input type="text" id="query" name="query" placeholder="Enter song title or artist name"
+                   oninvalid="setCustomValidity('Enter song title')" required="">
+            <button class="button" type="submit">Search</button>
+            <div id="searchResults" class="search-results"></div>
+        </form>
+
+        <nav class="nav nav-masthead justify-content-center">
+            <div class="dropdown nav-link active">
+                <p sec:authentication="name"></p>
+                <div class="dropdown-content">
+                    <div class="dropdown-content">
+                        <a class="" href="/edit">Edit account</a>
+                        <a class="" href="/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+            <a sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN','USER')" class="nav-link active"
+               href="/song-add">Add song</a>
+            <a sec:authorize="hasAnyAuthority('USER')" class="nav-link active"
+               href="/charts">Charts</a>
+            <a sec:authorize="hasAuthority('USER')" class="nav-link active"
+               href="/all-songs">All songs</a>
+            <a sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN','USER')" class="nav-link active"
+               href="/home">Home</a>
+        </nav>
+    </header>
+    <main role="main" class="inner cover">
+        <input
+            style="float: left;margin-right: 10px;"
+            action="action"
+            onclick="window.history.go(-1); return false;"
+            type="submit"
+            value="<-back"
+        />
+        <div style="float: left">
+            <div>Author:</div>
+            <h6 id="artist" th:text="${song.artist.name}"></h6>
+            <button id="modal-btn">More information</button>
+            <button sec:authorize="hasAnyAuthority('SUPERADMIN','ADMIN')" id="edit-genre-button">
+                Change genre
+            </button>
+            <div th:if="${song.getYoutubeLink()}">
+                <a th:href="${song.getYoutubeLink()}">Youtube-Link</a>
+            </div>
+            <button sec:authorize="hasAuthority('USER')" id="add-lyric-button">
+                Add propose lyric
+            </button>
+            <div>Title:</div>
+            <h6 id="title" th:text="${song.title}"></h6>
+            <div>Genre:</div>
+            <h6 id="genre" th:text="${song.genre.title}"></h6>
+        </div>
+
+        <!--Modal change genre-->
+        <div class="modal" id="edit-genre-modal" tabindex="-1" role="dialog"
+             aria-labelledby="edit-genre-modal-label">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" style="float: left"
+                            id="edit-genre-modal-label">
+                            Edit Genre</h4>
+                        <button type="button" style="float: right" class="close"
+                                data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="select-genre">Select genre</label>
+                            <select id="select-genre">
+                                <option th:each="genre : ${genres}" th:value="${genre.getId()}"
+                                        th:text="${genre.getTitle()}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="save-genre-button">
+                            Save genre
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Modal add propose lyric -->
+        <div class="modal" id="add-propose-modal" tabindex="-1" role="dialog"
+             aria-labelledby="add-propose-modal-label">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" style="float: left"
+                            id="add-propose-modal-label">
+                            Add lyric propose</h4>
+                        <button type="button" style="float: right" class="close"
+                                data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="add-propose-textarea">New lyric:</label>
+                            <textarea style="height: 250px" type="text" class="form-control"
+                                      id="add-propose-textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="add-propose-button">
+                            Save propose
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="modal-artist-details" class="modal-artist-details">
+            <div class="modal-content-artist-details">
+                <span class="close">&times;</span>
+                <h2 id="artist-name"></h2>
+                <p id="artist-description"></p>
+                <a class="btn btn-primary"
+                   th:href="@{/artist-all-songs(artistId=${song.getArtist().getId()})}"> All
+                    song of artist</a>
+            </div>
+        </div>
+        <a id="downloadSongText" href="#">Download lyric of song</a>
+        <a sec:authorize="hasAnyAuthority('ADMIN','SUPERADMIN')" id="deleteSelectedLyric" href="#">Delete
+            selected lyric</a>
+        <div style="float: left; margin-left: 20px;">
+            <div>Date of lyric version:</div>
+            <select id="select-lyric" onchange="showLyrics(this)">
+                <option th:each="lyric : ${lyrics}"
+                        th:value="${lyric.text}"
+                        th:text="${lyric.createdAt}"
+                        th:data-lyric-id="${lyric.id}"
+                        th:selected="${lyric == lyrics[0]}"></option>
+            </select>
+
+            <div id="lyricsContainer">
+                <p th:each="paragraph : ${lyrics[0].text.split('\n')}" th:text="${paragraph}"></p>
+            </div>
+        </div>
+
+        <input type="hidden" id="song-id" th:value="${song.id}">
+        <input type="hidden" id="song-artist-description" th:value="${song.artist.description}">
+        <input type="hidden" id="username" th:value="${username}">
+        <input type="hidden" id="user-role" th:value="${userRole.title}">
+        <div>
+            <form style="float: right;" id="commentForm">
+                <div>
+                    <textarea style="border-radius: 10px;height: 100px;width: 300px;"
+                              id="commentText" rows="3" placeholder="Enter your comment"></textarea>
+                </div>
+                <div>
+                    <button class="btn btn-primary" type="submit">Add Comment</button>
+                </div>
+            </form>
+            <div id="commentListContainer">
+                <div id="commentList"></div>
+            </div>
+        </div>
+
+    </main>
+    <footer class="mastfoot mt-auto">
+        <div class="inner">
+            <p>Lyric search for <a href="http://geekhub.ck.ua">Geekhub</a>, by <a
+                href="">Ivan Dulskyi</a>.</p>
+        </div>
+    </footer>
+</div>
+<script th:src="@{js/showLyrics.js}"></script>
+<script th:src="@{js/deleteLyric.js}"></script>
+<script th:src="@{/js/main/addPropose.js}"></script>
+<script th:src="@{js/admin/editGenre.js}"></script>
+<script th:src="@{/js/main/comments.js}"></script>
+<script th:src="@{/js/main/artistDetails.js}"></script>
+<script th:src="@{/js/main/downloadSong.js}"></script>
+</body>
+</html>

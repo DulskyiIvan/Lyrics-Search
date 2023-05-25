@@ -1,0 +1,17 @@
+#commentForm {
+    bottom: 0;
+    left: 0;
+}
+
+#commentList {
+
+}
+
+#commentListContainer {
+    height: 200px;
+    overflow: auto;
+    margin-top: 50px;
+    width: 350px;
+    float: right;
+
+}
